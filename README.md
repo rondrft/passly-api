@@ -38,7 +38,7 @@ This project serves as a **personal learning exercise** for deepening knowledge 
 - JPA/Hibernate, RESTful APIs
 
 ### Databases
-- PostgreSQL, MySQL
+- PostgreSQL
 
 ### DevOps / Cloud (learning)
 - Docker, AWS, GCP
