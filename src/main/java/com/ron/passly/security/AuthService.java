@@ -3,11 +3,15 @@ package com.ron.passly.security;
 import com.ron.passly.dto.LoginRequest;
 import com.ron.passly.dto.LoginResponse;
 import com.ron.passly.dto.RegisterRequest;
+import com.ron.passly.exception.CustomException;
+import com.ron.passly.exception.InvalidCredentialsException;
+import com.ron.passly.exception.UserNotFoundException;
 import com.ron.passly.model.User;
 import com.ron.passly.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +43,29 @@ public class AuthService  {
                 .email(savedUser.getEmail())
                 .token(token)
                 .build();
+    }
+
+    public LoginResponse login(LoginRequest request) {
+
+        //Find by Email
+        User user = userService.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException(request.getEmail()));
+
+        //Check Password
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new InvalidCredentialsException();
+        }
+
+        String token = jwtService.generateToken(user);
+
+        return LoginResponse.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .token(token)
+                .build();
+
     }
 
 }
