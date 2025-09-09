@@ -6,9 +6,7 @@ import com.ron.passly.repository.PasswordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Book;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -38,9 +36,5 @@ public class PasswordService {
     public void deletePassword(UUID id) {
         passwordRepository.deleteById(id);
     }
-
-
-
-
 
 }
