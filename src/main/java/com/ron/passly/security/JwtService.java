@@ -36,6 +36,7 @@ public class JwtService {
         //Extra Claims
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("id", user.getId());
+        extraClaims.put("roles", user.getRoles().stream().map(Enum::name).toList());
 
         return Jwts.builder()
                 .setClaims(extraClaims)

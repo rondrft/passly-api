@@ -25,7 +25,7 @@ public class PasswordService {
     }
 
     public Password updatePassword(UUID userId, String name, String newEncryptedValue) {
-        Password password = passwordRepository.findByNameAndUserId(userId, name)
+        Password password = passwordRepository.findByNameAndUser_Id(name, userId)
                 .orElseThrow(() -> new RuntimeException("Password not found for " + name));
 
         password.setEncryptedValue(newEncryptedValue);
