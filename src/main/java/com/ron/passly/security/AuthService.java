@@ -6,12 +6,15 @@ import com.ron.passly.dto.RegisterRequest;
 import com.ron.passly.exception.CustomException;
 import com.ron.passly.exception.InvalidCredentialsException;
 import com.ron.passly.exception.UserNotFoundException;
+import com.ron.passly.model.Roles;
 import com.ron.passly.model.User;
 import com.ron.passly.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,9 @@ public class AuthService  {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
+        // Asignar rol por defecto
+        user.setRoles(List.of(Roles.USER));
+
         //Call UserService
         User savedUser = userService.createUser(user);
 
@@ -47,9 +53,16 @@ public class AuthService  {
 
     public LoginResponse login(LoginRequest request) {
 
-        //Find by Email
-        User user = userService.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserNotFoundException(request.getEmail()));
+        //Email and Password Validation
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty() || request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new InvalidCredentialsException();
+        }
+
+        //Find by Email and Null Validation
+        User user = userService.findByEmail(request.getEmail()).orElse(null);
+        if (user == null) {
+            throw new InvalidCredentialsException();
+        }
 
         //Check Password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {

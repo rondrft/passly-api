@@ -1,5 +1,6 @@
 package com.ron.passly.service;
 
+import com.ron.passly.exception.UserAlreadyExistsException;
 import com.ron.passly.model.User;
 import com.ron.passly.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,7 @@ public class UserService {
 
     public User createUser(User user) {
         userRepository.findByEmail(user.getEmail())
-                .ifPresent(u -> {throw new RuntimeException("User with email " + user.getEmail() + " already exists"); });
-        return userRepository.save(user);
+                .ifPresent(u -> { throw new UserAlreadyExistsException(user.getEmail()); });        return userRepository.save(user);
     }
 
     public Optional<User> findByEmail(String email) {
