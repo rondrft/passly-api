@@ -3,16 +3,13 @@ package com.ron.passly.security;
 import com.ron.passly.dto.LoginRequest;
 import com.ron.passly.dto.LoginResponse;
 import com.ron.passly.dto.RegisterRequest;
-import com.ron.passly.exception.CustomException;
 import com.ron.passly.exception.InvalidCredentialsException;
-import com.ron.passly.exception.UserNotFoundException;
 import com.ron.passly.model.Roles;
 import com.ron.passly.model.User;
 import com.ron.passly.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
