@@ -20,7 +20,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        if  (request.getRequestURI().endsWith("/api/auth/")) {
+        if  (request.getRequestURI().startsWith("/api/auth/")) {
             String clientId = getClientId(request);
 
             if (!rateLimitingService.isAllowed(clientId, request)) {
