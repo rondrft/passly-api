@@ -9,27 +9,42 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    private RateLimitingService rateLimitingService;
+    private final RateLimitingService rateLimitingService;
+
+    public RateLimitInterceptor(RateLimitingService rateLimitingService) {
+        this.rateLimitingService = rateLimitingService;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        if (request.getRequestURI().startsWith("/api/auth/")) {
+        if  (request.getRequestURI().endsWith("/api/auth/")) {
             String clientId = getClientId(request);
 
-            if (!rateLimitingService.isAllowed(clientId)) {
-                response.setStatus(429);
-                response.setContentType("application/json");
-                response.getWriter().write("{\"error\":\"Rate limit exceeded. Try again later.\"}");
+            if (!RateLimitingService.isAllowed(clientId, request)) {
+                handleRateLimitExceeded(response, request);
                 return false;
             }
         }
+    }
 
-        return true;
+    private void handleRateLimitExceeded(HttpServletResponse response, HttpServletRequest request) {
+        response.setStatus(429);
+        response.setContentType("application/json");
+
+        String jsonResponse = """
+        {
+            "error": "Too Many Requests",
+            "message": "Rate limit exceeded, Please try again later"
+            "retryAfter": 60
+        }
+        """;
+
+        response.getWriter().write(jsonResponse);
     }
 
     private String getClientId(HttpServletRequest request) {
         return request.getRemoteAddr();
     }
+
 }

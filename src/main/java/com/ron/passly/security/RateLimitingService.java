@@ -1,5 +1,6 @@
 package com.ron.passly.security;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.Duration;
@@ -10,20 +11,35 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RateLimitingService {
 
     private final Map<String, List<LocalDateTime>> requestCounts = new ConcurrentHashMap<>();
-    private static final int MAX_REQUESTS = 5;
-    private static final Duration TIME_WINDOW = Duration.ofMinutes(1);
+    private final RiskAssessmentService riskAssessmentService;
 
-    public boolean isAllowed(String clientId) {
+    public RateLimitingService(RiskAssessmentService riskAssessmentService) {
+        this.riskAssessmentService = riskAssessmentService;
+    }
+
+    public boolean isAllowed(String clientId, HttpServletRequest request) {
+
+        SecurityRiskLevel riskLevel = riskAssessmentService.assessRisk(clientId, request);
+
+        int maxRequest = riskLevel.getMaxRequest();
+        Duration timeWindow = riskLevel.getTimeWindow();
+
+        return checkRateLimit(clientId, maxRequest, timeWindow);
+    }
+
+    private boolean checkRateLimit(String clientId, int maxRequests, Duration timeWindow) {
+
         List<LocalDateTime> requests = requestCounts.computeIfAbsent(clientId, k -> new ArrayList<>());
 
-        LocalDateTime cutoff = LocalDateTime.now().minus(TIME_WINDOW);
+        LocalDateTime cutoff = LocalDateTime.now().minus(timeWindow);
         requests.removeIf(time -> time.isBefore(cutoff));
 
-        if (requests.size() >= MAX_REQUESTS) {
+        if (requests.size() >= maxRequests) {
             return false;
         }
 
         requests.add(LocalDateTime.now());
         return true;
     }
+
 }
