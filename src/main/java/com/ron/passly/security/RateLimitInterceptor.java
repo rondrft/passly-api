@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.io.IOException;
+
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
 
@@ -21,24 +23,26 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         if  (request.getRequestURI().endsWith("/api/auth/")) {
             String clientId = getClientId(request);
 
-            if (!RateLimitingService.isAllowed(clientId, request)) {
+            if (!rateLimitingService.isAllowed(clientId, request)) {
                 handleRateLimitExceeded(response, request);
                 return false;
             }
         }
+
+        return true;
     }
 
-    private void handleRateLimitExceeded(HttpServletResponse response, HttpServletRequest request) {
+    private void handleRateLimitExceeded(HttpServletResponse response, HttpServletRequest request) throws IOException {
         response.setStatus(429);
         response.setContentType("application/json");
 
         String jsonResponse = """
-        {
-            "error": "Too Many Requests",
-            "message": "Rate limit exceeded, Please try again later"
-            "retryAfter": 60
-        }
-        """;
+    {
+        "error": "Too Many Requests",
+        "message": "Rate limit exceeded. Please try again later.",
+        "retryAfter": 60
+    }
+    """;
 
         response.getWriter().write(jsonResponse);
     }
