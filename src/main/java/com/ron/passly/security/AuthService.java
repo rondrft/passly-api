@@ -77,8 +77,8 @@ public class AuthService  {
 
             // Verify password
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-
                 riskAssessmentService.recordFailedAttempt(clientId);
+
                 log.warn("Login failed: Wrong password for user: {} from IP: {}",
                         request.getEmail(), clientId);
                 throw new InvalidCredentialsException();

@@ -5,11 +5,12 @@ import com.ron.passly.exception.UserNotFoundException;
 import com.ron.passly.model.User;
 import com.ron.passly.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,9 +23,14 @@ public class UserService {
                 .ifPresent(u -> { throw new UserAlreadyExistsException(user.getEmail()); });
         return userRepository.save(user);
     }
-
+    @Cacheable("users")
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @CacheEvict("users")
+    public User updateUser(User user) {
+        return userRepository.save(user);
     }
 
     public List<User> findAll() {

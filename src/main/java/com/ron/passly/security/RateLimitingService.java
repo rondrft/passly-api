@@ -1,6 +1,7 @@
 package com.ron.passly.security;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.Duration;
@@ -12,6 +13,15 @@ public class RateLimitingService {
 
     private final Map<String, List<LocalDateTime>> requestCounts = new ConcurrentHashMap<>();
     private final RiskAssessmentService riskAssessmentService;
+
+    @Scheduled(fixedRate = 300000)
+    public void cleanupOldEntries() {
+        LocalDateTime cutoff = LocalDateTime.now().minusHours(1);
+        requestCounts.entrySet().removeIf(entry -> {
+            entry.getValue().removeIf(time -> time.isBefore(cutoff));
+            return entry.getValue().isEmpty(); // Remove empty lists
+        });
+    }
 
     public RateLimitingService(RiskAssessmentService riskAssessmentService) {
         this.riskAssessmentService = riskAssessmentService;

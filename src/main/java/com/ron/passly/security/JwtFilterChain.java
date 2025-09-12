@@ -24,12 +24,9 @@ public class JwtFilterChain extends OncePerRequestFilter {
     private UserService userService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String path = request.getServletPath();
-
         if (path.startsWith("/api/auth/")) {
             filterChain.doFilter(request, response);
             return;
@@ -41,16 +38,23 @@ public class JwtFilterChain extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7);
-        String email = jwtService.extractEmail(token);
+        try {
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userService.findByEmail(email).orElse(null);
-            if (user != null && jwtService.isTokenValid(token, user.getUsername())) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            String token = authHeader.substring(7);
+            String email = jwtService.extractEmail(token);
+
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                User user = userService.findByEmail(email).orElse(null);
+
+                if (user != null && jwtService.isTokenValid(token, user.getUsername())) {
+
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+
         }
 
         filterChain.doFilter(request, response);
