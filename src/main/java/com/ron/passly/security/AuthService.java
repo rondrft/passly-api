@@ -23,7 +23,7 @@ public class AuthService  {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private RiskAssessmentService riskAssessmentService;
+    private final RiskAssessmentService riskAssessmentService;
 
     public LoginResponse register(RegisterRequest registerRequest) {
 
