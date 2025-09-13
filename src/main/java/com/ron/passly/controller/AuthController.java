@@ -3,7 +3,7 @@ package com.ron.passly.controller;
 import com.ron.passly.dto.LoginRequest;
 import com.ron.passly.dto.LoginResponse;
 import com.ron.passly.dto.RegisterRequest;
-import com.ron.passly.security.AuthService;
+import com.ron.passly.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

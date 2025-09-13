@@ -1,4 +1,4 @@
-package com.ron.passly.security;
+package com.ron.passly.service;
 
 import com.ron.passly.dto.LoginRequest;
 import com.ron.passly.dto.LoginResponse;
@@ -6,7 +6,8 @@ import com.ron.passly.dto.RegisterRequest;
 import com.ron.passly.exception.InvalidCredentialsException;
 import com.ron.passly.model.Roles;
 import com.ron.passly.model.User;
-import com.ron.passly.service.UserService;
+import com.ron.passly.security.JwtService;
+import com.ron.passly.security.RiskAssessmentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
