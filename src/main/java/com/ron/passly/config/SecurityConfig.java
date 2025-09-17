@@ -87,10 +87,10 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints públicos
+
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/health").permitAll()
-                        .requestMatchers("/actuator/health").permitAll() // Si usas Spring Actuator
+                        .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/error").permitAll()
 
                         .anyRequest().authenticated()
