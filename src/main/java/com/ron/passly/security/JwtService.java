@@ -1,5 +1,6 @@
 package com.ron.passly.security;
 
+import com.ron.passly.dto.AuthUser;
 import com.ron.passly.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -45,6 +46,24 @@ public class JwtService {
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getUsername())
+                .setIssuer("Passly-API")
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateToken(AuthUser authUser){
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+
+        Map<String,Object> extraClaims = new HashMap<>();
+        extraClaims.put("id", authUser.getId());
+        extraClaims.put("roles", authUser.getRoles());
+
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setSubject(authUser.getEmail())
                 .setIssuer("Passly-API")
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)

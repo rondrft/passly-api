@@ -1,5 +1,6 @@
 package com.ron.passly.service;
 
+import com.ron.passly.dto.AuthUser;
 import com.ron.passly.dto.LoginRequest;
 import com.ron.passly.dto.LoginResponse;
 import com.ron.passly.dto.RegisterRequest;
@@ -67,8 +68,8 @@ public class AuthService  {
 
         try {
             // Find User
-            User user = userService.findByEmail(request.getEmail()).orElse(null);
-            if (user == null) {
+            AuthUser authUser = userService.findAuthDataByEmail(request.getEmail()).orElse(null);
+            if (authUser == null) {
 
                 riskAssessmentService.recordFailedAttempt(clientId);
                 log.warn("Login failed: User not found - Email: {} from IP: {}",
@@ -77,7 +78,7 @@ public class AuthService  {
             }
 
             // Verify password
-            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            if (!passwordEncoder.matches(request.getPassword(), authUser.getPassword())) {
                 riskAssessmentService.recordFailedAttempt(clientId);
 
                 log.warn("Login failed: Wrong password for user: {} from IP: {}",
@@ -88,13 +89,13 @@ public class AuthService  {
             riskAssessmentService.recordSuccessfulAttempt(clientId);
             log.info("Login successful for user: {} from IP: {}", request.getEmail(), clientId);
 
-            String token = jwtService.generateToken(user);
+            String token = jwtService.generateToken(authUser);
 
             return LoginResponse.builder()
-                    .id(user.getId())
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
-                    .email(user.getEmail())
+                    .id(authUser.getId())
+                    .firstName(authUser.getFirstName())
+                    .lastName(authUser.getLastName())
+                    .email(authUser.getEmail())
                     .token(token)
                     .build();
 

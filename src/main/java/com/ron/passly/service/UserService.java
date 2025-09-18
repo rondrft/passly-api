@@ -1,5 +1,6 @@
 package com.ron.passly.service;
 
+import com.ron.passly.dto.AuthUser;
 import com.ron.passly.exception.UserAlreadyExistsException;
 import com.ron.passly.exception.UserNotFoundException;
 import com.ron.passly.model.User;
@@ -31,6 +32,11 @@ public class UserService {
     @CacheEvict("users")
     public User updateUser(User user) {
         return userRepository.save(user);
+    }
+
+    @Cacheable(value = "auth-cache", key = "#email.toLowerCase()")
+    public Optional<AuthUser> findAuthDataByEmail(String email) {
+        return userRepository.findAuthDataByEmail(email);
     }
 
     public List<User> findAll() {
