@@ -1,12 +1,20 @@
 package com.ron.passly.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "user_encryption_keys")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserEncryptionKey {
 
     @Id
@@ -38,51 +46,6 @@ public class UserEncryptionKey {
         updatedAt = LocalDateTime.now();
     }
 
-    public UserEncryptionKey() {}
 
-    public UserEncryptionKey(User user, String encryptedKey, UUID id) {
-        this.user = user;
-        this.encryptedKey = encryptedKey;
-        this.id = id;
-    }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getEncryptedKey() {
-        return encryptedKey;
-    }
-
-    public void setEncryptedKey(String encryptedKey) {
-        this.encryptedKey = encryptedKey;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 }

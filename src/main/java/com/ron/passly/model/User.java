@@ -2,8 +2,7 @@ package com.ron.passly.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,8 +15,10 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User implements UserDetails {
 
     @Id
@@ -49,9 +50,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private List<Roles> roles = new ArrayList<>();
 
-
-    public User() {}
-
     public User(String firstName, String lastName, String email, String password, List<String> roles, UserEncryptionKey encryptionKey) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -60,7 +58,6 @@ public class User implements UserDetails {
         this.roles = List.of(Roles.USER);
         this.encryptionKey = encryptionKey;
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

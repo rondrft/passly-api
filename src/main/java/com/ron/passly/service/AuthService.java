@@ -31,12 +31,12 @@ public class AuthService  {
 
         //Convert DTO to Entity
         User user = new User();
-        user.setFirstName(registerRequest.getFirstName());
+         user.setFirstName(registerRequest.getFirstName());
         user.setLastName(registerRequest.getLastName());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
-        // Asignar rol por defecto
+        // Default role
         user.setRoles(List.of(Roles.USER));
 
         //Call UserService
