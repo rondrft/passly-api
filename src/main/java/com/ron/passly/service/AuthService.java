@@ -61,13 +61,7 @@ public class AuthService  {
         //Create Token
         String token = jwtService.generateToken(savedUser);
 
-        return LoginResponse.builder()
-                .id(savedUser.getId())
-                .firstName(savedUser.getFirstName())
-                .lastName(savedUser.getLastName())
-                .email(savedUser.getEmail())
-                .token(token)
-                .build();
+        return buildLoginResponse(token, savedUser.getId(), savedUser.getFirstName(), savedUser.getLastName(), savedUser.getEmail());
     }
 
     public LoginResponse login(LoginRequest request, HttpServletRequest httpRequest) {
@@ -107,13 +101,7 @@ public class AuthService  {
 
             String token = jwtService.generateToken(authUser);
 
-            return LoginResponse.builder()
-                    .id(authUser.getId())
-                    .firstName(authUser.getFirstName())
-                    .lastName(authUser.getLastName())
-                    .email(authUser.getEmail())
-                    .token(token)
-                    .build();
+            return buildLoginResponse(token, authUser.getId(), authUser.getFirstName(), authUser.getLastName(), authUser.getEmail());
 
         } catch (InvalidCredentialsException ex) {
 
@@ -132,6 +120,16 @@ public class AuthService  {
             return xForwardedFor.split(",")[0].trim();
         }
         return request.getRemoteAddr();
+    }
+
+    private LoginResponse buildLoginResponse(String token, java.util.UUID id, String firstName, String lastName, String email) {
+        return LoginResponse.builder()
+                .id(id)
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .token(token)
+                .build();
     }
 
 }
