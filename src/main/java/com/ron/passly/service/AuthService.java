@@ -7,6 +7,7 @@ import com.ron.passly.dto.RegisterRequest;
 import com.ron.passly.exception.InvalidCredentialsException;
 import com.ron.passly.model.Roles;
 import com.ron.passly.model.User;
+import com.ron.passly.model.UserEncryptionKey;
 import com.ron.passly.security.JwtService;
 import com.ron.passly.security.RiskAssessmentService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,18 +28,32 @@ public class AuthService  {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RiskAssessmentService riskAssessmentService;
+    private final EncryptionService encryptionService;
 
+    @Transactional
     public LoginResponse register(RegisterRequest registerRequest) {
 
         //Convert DTO to Entity
         User user = new User();
-         user.setFirstName(registerRequest.getFirstName());
+        user.setFirstName(registerRequest.getFirstName());
         user.setLastName(registerRequest.getLastName());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
         // Default role
         user.setRoles(List.of(Roles.USER));
+
+        String dek = encryptionService.generateRandomKey();
+        String salt = encryptionService.generateSalt();
+        String kek = encryptionService.deriveKeyFromPassword(registerRequest.getPassword(), salt);
+        String encryptedDek = encryptionService.encrypt(dek, kek);
+
+        UserEncryptionKey userEncryptionKey = UserEncryptionKey.builder()
+                .encryptedKey(encryptedDek)
+                .salt(salt)
+                .build();
+
+        user.setEncryptionKey(userEncryptionKey);
 
         //Call UserService
         User savedUser = userService.createUser(user);
